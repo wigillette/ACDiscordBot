@@ -1,4 +1,3 @@
-require('dotenv').config()
 const { MongoClient } = require('mongodb');
 
 // Database URL
@@ -10,6 +9,7 @@ const connect = async () => {
         client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         await client.connect();
         console.log('Connected to Avarian Database');
+        return client
     } catch (e) {
         console.error('Failed to connect to Avarian Database: ', e);
     }

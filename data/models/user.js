@@ -1,21 +1,33 @@
 const {getDB} = require('../db');
-
+const Joi = require('joi');
 // Database Variables
 const db=getDB();
 const User=db.collection('user'); // user table
 
 // User table methods
+// Schema
+const userSchema = Joi.object({
+    _id: Joi.number().integer().required(),
+    valor: Joi.number().integer().required(),
+    lastActive: Joi.string().regex(/^\d{2}\/\d{2}\/\d{2}$/).date({format: 'MM/DD/YY'}),
+    squadronId: Joi.number().integer().required()
+})
+
 /**
  * Create User
- * @param {table} user {robloxId: ... (UNIQUE), kills: number, deaths: number, captures: {gate: number, terminal: number}, valor: number, lastActive: MMDDYY, squadronID: number, level: number, experience: number}
+ * @param {table} user {_id: robloxId, valor: number, lastActive: MMDDYY, squadronID: number}
  * @returns {number} insertedId: number of changes
  */
 const createUser = async (user) => {
     try {
+        const { error, value } = userSchema.validate(user);
+        if (error) {
+            throw new Error(`Invalid user object: ${error.message}`);
+        }
         const result = await User.insertOne(user);
         return result.insertedId;
-    } catch (error) {
-        console.error('Error creating user', error);
+    } catch (e) {
+        console.error('Error creating user', e);
         throw error;
     }
 }
@@ -27,23 +39,31 @@ const createUser = async (user) => {
  */
 const getUserByRobloxId = async (robloxId) => {
     try {
-        const user = await User.findOne({robloxId: robloxId});
+        const paramSchema = Joi.number().integer().positive().required();
+        const {error, value} = paramSchema.validate(robloxId);
+        if (error) {
+            throw new Error(`Invalid robloxId: ${error.message}`);
+        }
+        const user = await User.findOne({_id: robloxId});
         return user;
     } catch (e) {
-        console.error('Error getting user by ID:', error);
+        console.error('Error getting user by ID:', e);
         throw error;
     }
 }
 
 /**
  * Update User
- * @param {number} robloxId A user's unique ROBLOX ID
- * @param {table} updateData An updated user table: {robloxId: ... (UNIQUE), kills: number, deaths: number, captures: {gate: number, terminal: number}, valor: number, lastActive: MMDDYY, squadronID: number, level: number, experience: number}
+ * @param {table} updateData An updated user table:{_id: robloxId, valor: number, lastActive: MMDDYY, squadronID: number}
  * @returns {number} number of changes
  */
-const updateUser = async (robloxId, updateData) => {
+const updateUser = async (userData) => {
     try {
-        const res = await User.updateOne({robloxId: robloxId}, {$set: updateData});
+        const { error, value } = userSchema.validate(userData);
+        if (error) {
+            throw new Error(`Invalid user object: ${error.message}`);
+        }
+        const res = await User.updateOne({_id: userData._id}, {$set: userData});
         return res.modifiedCount;
     } catch (e) {
         console.error('Error updating user', e)
@@ -58,7 +78,12 @@ const updateUser = async (robloxId, updateData) => {
  */
 const deleteUser = async (robloxId) => {
     try {
-        const result = await User.deleteOne({_id: userId});
+        const paramSchema = Joi.number().integer().positive().required();
+        const {error, value} = paramSchema.validate(robloxId);
+        if (error) {
+            throw new Error(`Invalid robloxId: ${error.message}`);
+        }
+        const result = await User.deleteOne({_id: robloxId});
         return result.deletedCount;
     } catch (e) {
         console.error('Error deleting user', e);
