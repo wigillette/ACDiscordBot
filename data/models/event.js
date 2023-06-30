@@ -4,12 +4,12 @@ const Joi = require('joi');
 // Database Variables
 const db=getDB();
 const Event=db.collection('event'); // leaderboard table
-const validTypes=['Training','Raid','Defense']
+const VALID_EVENTS=require('../../shared/eventTypes.js')
 
 // Event Methods
 // Schema
 const eventSchema = Joi.object({
-    eventType: Joi.string().valid(...validTypes).required(),
+    eventType: Joi.string().valid(...VALID_EVENTS).required(),
     hostId: Joi.number().integer().required(),
     date: Joi.string().regex(/^\d{2}\/\d{2}\/\d{2}$/).date({format: 'MM/DD/YY'}).required(),
     notes: Joi.string(),
@@ -25,7 +25,7 @@ const createEvent = async (eventInfo) => {
     try {
         const {error, value} = eventSchema.validate(eventInfo);
         if (error) {
-            throw new Error(`Invalid event Info: ${error.message}`);
+            console.error(`Invalid event Info: ${error.message}`);
         }
         const res = await Event.insertOne(eventInfo)
         return res.insertedId;

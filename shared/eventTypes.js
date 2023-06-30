@@ -1,0 +1,1 @@
+module.exports=['Training', 'Raid', 'Defense', 'Recruitment', 'Game Night']

@@ -3,6 +3,7 @@ const Joi = require('joi');
 // Database Variables
 const db=getDB();
 const User=db.collection('user'); // user table
+const VALID_SQUADRONS = require('../../shared/squadrons')
 
 // User table methods
 // Schema
@@ -10,19 +11,19 @@ const userSchema = Joi.object({
     _id: Joi.number().integer().required(),
     valor: Joi.number().integer().required(),
     lastActive: Joi.string().regex(/^\d{2}\/\d{2}\/\d{2}$/).date({format: 'MM/DD/YY'}),
-    squadronId: Joi.number().integer().required()
+    squadronName: Joi.string().valid(...VALID_SQUADRONS).required()
 })
 
 /**
  * Create User
- * @param {table} user {_id: robloxId, valor: number, lastActive: MMDDYY, squadronID: number}
+ * @param {table} user {_id: robloxId, valor: number, lastActive: MMDDYY, squadronName: string}
  * @returns {number} insertedId: number of changes
  */
 const createUser = async (user) => {
     try {
         const { error, value } = userSchema.validate(user);
         if (error) {
-            throw new Error(`Invalid user object: ${error.message}`);
+            console.error(`Invalid user object: ${error.message}`);
         }
         const result = await User.insertOne(user);
         return result.insertedId;
@@ -42,7 +43,7 @@ const getUserByRobloxId = async (robloxId) => {
         const paramSchema = Joi.number().integer().positive().required();
         const {error, value} = paramSchema.validate(robloxId);
         if (error) {
-            throw new Error(`Invalid robloxId: ${error.message}`);
+            console.error(`Invalid robloxId: ${error.message}`);
         }
         const user = await User.findOne({_id: robloxId});
         return user;
@@ -54,14 +55,14 @@ const getUserByRobloxId = async (robloxId) => {
 
 /**
  * Update User
- * @param {table} updateData An updated user table:{_id: robloxId, valor: number, lastActive: MMDDYY, squadronID: number}
+ * @param {table} updateData An updated user table:{_id: robloxId, valor: number, lastActive: MMDDYY, squadronName: string}
  * @returns {number} number of changes
  */
 const updateUser = async (userData) => {
     try {
         const { error, value } = userSchema.validate(userData);
         if (error) {
-            throw new Error(`Invalid user object: ${error.message}`);
+            console.error(`Invalid user object: ${error.message}`);
         }
         const res = await User.updateOne({_id: userData._id}, {$set: userData});
         return res.modifiedCount;
@@ -81,7 +82,7 @@ const deleteUser = async (robloxId) => {
         const paramSchema = Joi.number().integer().positive().required();
         const {error, value} = paramSchema.validate(robloxId);
         if (error) {
-            throw new Error(`Invalid robloxId: ${error.message}`);
+            console.error(`Invalid robloxId: ${error.message}`);
         }
         const result = await User.deleteOne({_id: robloxId});
         return result.deletedCount;

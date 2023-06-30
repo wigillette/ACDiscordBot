@@ -32,7 +32,7 @@ const createLeaderboard = async (robloxId) => {
         const paramSchema = Joi.number().integer().positive().required();
         const {error, value} = paramSchema.validate(robloxId);
         if (error) {
-            throw new Error(`Invalid robloxId: ${error.message}`);
+            console.error(`Invalid robloxId: ${error.message}`);
         }
         const res = await Leaderboard.insertOne({_id: robloxId, ...DEFAULT_LB})
         return res.insertedId;
@@ -52,7 +52,7 @@ const getLeaderboard = async (robloxId) => {
         const paramSchema = Joi.number().integer().positive().required();
         const {error, value} = paramSchema.validate(robloxId);
         if (error) {
-            throw new Error(`Invalid robloxId: ${error.message}`);
+            console.error(`Invalid robloxId: ${error.message}`);
         }
         const res = await Leaderboard.findOne({_id: robloxId});
         return res;
@@ -72,7 +72,7 @@ const updateLeaderboard = async (leaderboardData) => {
     try {
         const { error, value } = leaderboardSchema.validate(leaderboardData);
         if (error) {
-            throw new Error(`Invalid leaderboard object: ${error.message}`);
+            console.error(`Invalid leaderboard object: ${error.message}`);
         }
         const res = await Leaderboard.updateOne({_id: leaderboardData._id}, {$set: leaderboardData});
         return res.modifiedCount;
