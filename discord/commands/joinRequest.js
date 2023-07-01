@@ -12,21 +12,18 @@ module.exports = {
 			.setDescription('View a list of the current join requests'),
 		)
 		.addSubcommand(command => command
-			.setName('accept')
-			.setDescription('Accept an existing join request')
+			.setName('handle')
+			.setDescription('Handle an existing join request')
 			.addStringOption(option => option
 				.setName('username')
 				.setDescription('Enter the ROBLOX username of the user you wish to accept')
 				.setRequired(true),
-			),
-		)
-		.addSubcommand(command => command
-			.setName('deny')
-			.setDescription('Deny an existing join request')
+			)
 			.addStringOption(option => option
-				.setName('username')
-				.setDescription('Enter the ROBLOX username of the user you wish to deny')
-				.setRequired(true),
+				.setName('response')
+				.setDescription('Decide whether to accept or deny the join request.')
+				.setRequired(true)
+				.addChoices({ name: 'Accept', value: 'Accept' }, { name: 'Decline', value: 'Decline' }),
 			),
 		),
 	admin: true,
@@ -43,26 +40,14 @@ module.exports = {
 			embed = EmbedBuilder('Join Request Notification', 'Here is a list of the current join requests in Avarian Reborn:', undefined, fields);
 			await interaction.reply({ embeds: [embed] });
 			break;
-		case 'accept':
+		case 'handle':
 			username = interaction.options.getString('username');
 			userId = await noblox.getIdFromUsername(username);
+			const isAccepted = interaction.options.getString('response') === 'Accept';
 			embed = EmbedBuilder('Join Request Notification', `Failed to accept ${username} into Avarian Reborn`);
 			if (userId) {
-				noblox.handleJoinRequest(process.env.GROUP_ID, userId, true).then(() => {
-					embed = EmbedBuilder('Join Request Notification', `Successfully accepted ${username} into Avarian Reborn`);
-				}).catch((e) => {
-					console.error(e);
-				});
-			}
-			await interaction.reply({ embeds: [embed] });
-			break;
-		case 'deny': // TO-DO: condense accept/deny into one function
-			username = interaction.options.getString('username');
-			userId = await noblox.getIdFromUsername(username);
-			embed = EmbedBuilder('Join Request Notification', `Failed to deny ${username}'s request into Avarian Reborn`);
-			if (userId) {
-				noblox.handleJoinRequest(process.env.GROUP_ID, userId, false).then(() => {
-					embed = EmbedBuilder('Join Request Notification', `Successfully denied ${username}'s request into Avarian Reborn`);
+				noblox.handleJoinRequest(process.env.GROUP_ID, userId, isAccepted).then(() => {
+					embed = EmbedBuilder('Join Request Notification', `Successfully ${isAccepted ? 'accepted' : 'denied'} ${username} into Avarian Reborn`);
 				}).catch((e) => {
 					console.error(e);
 				});
