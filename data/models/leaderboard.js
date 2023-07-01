@@ -1,26 +1,24 @@
-const {getDB} = require('../db');
-const Joi = require('joi');
+const { Schema, model } = require('mongoose');
 
 // Database Variables
-const db=getDB();
-const Leaderboard=db.collection('leaderboard'); // leaderboard table
-const DEFAULT_LB = {kills: 0, deaths: 0, level: 1, exp: 0, equippedSword: 'default', captures: {gate: 0, terminal: 0}}
+const DEFAULT_LB = { kills: 0, deaths: 0, level: 1, exp: 0, equippedSword: 'default', captures: { gate: 0, terminal: 0 } };
 
-// Leaderboard Methods
-// Schema
-const leaderboardSchema = Joi.object({
-    _id: Joi.number().integer().required(),
-    kills: Joi.number().integer().required(),
-    deaths: Joi.number().integer().required(),
-    level: Joi.number().integer().required(),
-    exp: Joi.number().integer().required(),
-    equippedSword: Joi.string().required(),
-    captures: Joi.object({
-        gate: Joi.number().integer().required(), 
-        terminal: Joi.number().integer().required()
-    })
-})
+// Leaderboard Schema
+const leaderboardSchema = new Schema({
+	_id: { type: Number, required: true },
+	kills: { type: Number, required: true },
+	deaths: { type: Number, required: true },
+	level: { type: Number, required: true },
+	exp: { type: Number, required: true },
+	equippedSword: { type: String, required: true },
+	captures: {
+		gate: { type: Number, required: true },
+		terminal: { type: Number, required: true },
+	},
+});
 
+// Leaderboard Model
+const LeaderboardModel = model('Leaderboard', leaderboardSchema);
 
 /**
  * Inserts an entry for a new user into the leaderboard with default stats
@@ -28,58 +26,57 @@ const leaderboardSchema = Joi.object({
  * @returns The id of the row inserted
  */
 const createLeaderboard = async (robloxId) => {
-    try {
-        const paramSchema = Joi.number().integer().positive().required();
-        const {error, value} = paramSchema.validate(robloxId);
-        if (error) {
-            console.error(`Invalid robloxId: ${error.message}`);
-        }
-        const res = await Leaderboard.insertOne({_id: robloxId, ...DEFAULT_LB})
-        return res.insertedId;
-    } catch (e) {
-        console.error('Failed to insert user\'s data into leaderboard', e);
-        throw e;
-    }
-}
+	try {
+		const paramSchema = Number.isInteger(robloxId) && robloxId > 0;
+		if (!paramSchema) {
+			console.error(`Invalid robloxId: ${robloxId}`);
+			return null;
+		}
+		const res = await LeaderboardModel.create({ _id: robloxId, ...DEFAULT_LB });
+		return res._id;
+	}
+	catch (e) {
+		console.error('Failed to insert user\'s data into leaderboard', e);
+		throw e;
+	}
+};
 
 /**
  * Fetches a user's leaderboard stats
- * @param {*} robloxId The user's roblox ID
+ * @param {number} robloxId The user's roblox ID
  * @returns The user's stats in form {_id: robloxId, kills: number, deaths: number, level: number, exp: number, equippedSword: string, captures: {gate: number, terminal: number}}
  */
 const getLeaderboard = async (robloxId) => {
-    try {
-        const paramSchema = Joi.number().integer().positive().required();
-        const {error, value} = paramSchema.validate(robloxId);
-        if (error) {
-            console.error(`Invalid robloxId: ${error.message}`);
-        }
-        const res = await Leaderboard.findOne({_id: robloxId});
-        return res;
-    } catch (e) {
-        console.error(`Failed to fetch leaderboard stats for ${robloxId}`, e);
-        throw e;
-    }
-}
+	try {
+		const paramSchema = Number.isInteger(robloxId) && robloxId > 0;
+		if (!paramSchema) {
+			console.error(`Invalid robloxId: ${robloxId}`);
+			return null;
+		}
+		const res = await LeaderboardModel.findOne({ _id: robloxId });
+		return res;
+	}
+	catch (e) {
+		console.error(`Failed to fetch leaderboard stats for ${robloxId}`, e);
+		throw e;
+	}
+};
 
 /**
  * Updates leaderboard stats
- * @param {number} robloxId The user's roblox ID
- * @param {table} leaderboardData {kills: number, deaths: number, level: number, exp: number, equippedSword: string, captures: {gate: number, terminal: number}} 
+ * @param {table} leaderboardData {kills: number, deaths: number, level: number, exp: number, equippedSword: string, captures: {gate: number, terminal: number}}
  * @returns The number of changes made
  */
 const updateLeaderboard = async (leaderboardData) => {
-    try {
-        const { error, value } = leaderboardSchema.validate(leaderboardData);
-        if (error) {
-            console.error(`Invalid leaderboard object: ${error.message}`);
-        }
-        const res = await Leaderboard.updateOne({_id: leaderboardData._id}, {$set: leaderboardData});
-        return res.modifiedCount;
-    } catch (e) {
-        console.error('Error updating leaderboard', e)
-        throw error;
-    }
-}
+	try {
+		const { _id, ...data } = leaderboardData;
+		const result = await LeaderboardModel.updateOne({ _id }, data);
+		return result.modifiedCount;
+	}
+	catch (e) {
+		console.error('Error updating leaderboard', e);
+		throw e;
+	}
+};
 
-module.exports={createLeaderboard, getLeaderboard, updateLeaderboard}
+module.exports = { createLeaderboard, getLeaderboard, updateLeaderboard };

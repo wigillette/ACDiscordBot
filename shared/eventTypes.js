@@ -1,1 +1,1 @@
-module.exports=['Training', 'Raid', 'Defense', 'Recruitment', 'Game Night']
+module.exports = ['Training', 'Raid', 'Defense', 'Recruitment', 'Game Night'];

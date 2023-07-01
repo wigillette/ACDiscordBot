@@ -1,20 +1,24 @@
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 
 // Database URL
-const uri = `mongodb+srv://wgillette02:${process.env.DB_PASS}@avarian-server.oeqkrth.mongodb.net/`
-let client;
-
 const connect = async () => {
-    try {
-        client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-        await client.connect();
-        console.log('Connected to Avarian Database');
-        return client
-    } catch (e) {
-        console.error('Failed to connect to Avarian Database: ', e);
-    }
-}
+	try {
+		await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+		console.log('Connected to Avarian Database');
+	}
+	catch (error) {
+		console.error('Failed to connect to Avarian Database:', error);
+	}
+};
 
-const getDB = () => client ? client.db(process.env.DB_NAME) : null;
+const closeConnection = async () => {
+	try {
+		await mongoose.connection.close();
+		console.log('MongoDB connection closed');
+	}
+	catch (error) {
+		console.error('Failed to close the MongoDB connection:', error);
+	}
+};
 
-module.exports = { connect, getDB }
+module.exports = { connect, closeConnection, mongoose };
