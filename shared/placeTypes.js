@@ -1,1 +1,1 @@
-module.exports = ['Fortress', 'Training', 'Rally', 'Miscellaneous']
+module.exports = ['Fortress', 'Training', 'Rally', 'Miscellaneous'];

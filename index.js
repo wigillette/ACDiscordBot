@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const { connect, closeConnection } = require('./data/db');
 const noblox = require('noblox.js');
 
@@ -8,22 +8,21 @@ const { initServer } = require('./server/app');
 
 // Connect to the MongoDB database
 connect().then(() => {
-    // Login into Avarian_Automation
-    const loginPromise = noblox.setCookie(process.env.AUTOMATION_COOKIE);
-    loginPromise.then((user) => {
-        const currentUserPromise = noblox.getCurrentUser();
-        currentUserPromise.then(() => {
-            console.log(`Logged in as ${user.UserName} [${user.UserID}]`);
-            initServer(); // Initialize the web server
-            initBot(); // Boot up the discord bot
-        })
-    })
-})
-.catch((error) => {
-    console.error('Error connecting to the database:', error);
+	// Login into Avarian_Automation
+	const loginPromise = noblox.setCookie(process.env.AUTOMATION_COOKIE);
+	loginPromise.then((user) => {
+		const currentUserPromise = noblox.getCurrentUser();
+		currentUserPromise.then(() => {
+			console.log(`Logged in as ${user.UserName} [${user.UserID}]`);
+			initServer(); // Initialize the web server
+			initBot(); // Boot up the discord bot
+		});
+	});
+}).catch((e) => {
+	console.error('Error connecting to the database:', e);
 });
 
 process.on('SIGINT', () => {
-    closeConnection();
-    process.exit();
+	closeConnection();
+	process.exit();
 });

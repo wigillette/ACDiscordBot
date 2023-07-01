@@ -13,9 +13,11 @@ module.exports = (title, desc, icon, fields) => {
 		.setTitle(title)
 		.setDescription(desc)
 		.setThumbnail(icon || 'https://tr.rbxcdn.com/71dc791749307b68c2c76022e30edcbd/150/150/Image/Png')
-		.addFields(fields)
 		.setColor('FF0000')
 		.setTimestamp()
 		.setFooter({ text: 'Powered by Avarian Automation', iconURL: 'https://tr.rbxcdn.com/71dc791749307b68c2c76022e30edcbd/150/150/Image/Png' });
+	if (fields) {
+		embed.addFields(fields);
+	}
 	return embed;
 };

@@ -50,8 +50,13 @@ module.exports = {
 				.addChoices(...EVENT_TYPES.map((place) => {return { name: place, value: place };})),
 			)
 			.addStringOption(option => option
-				.setName('location_time_date')
-				.setDescription('Enter the location, date, and time of the event.')
+				.setName('time_date')
+				.setDescription('Enter the date and time of the event.')
+				.setRequired(true),
+			)
+			.addStringOption(option => option
+				.setName('location')
+				.setDescription('Enter the location\'s place ID.')
 				.setRequired(true),
 			)
 			.addStringOption(option => option
@@ -63,31 +68,43 @@ module.exports = {
 	admin: true,
 	async execute(interaction) {
 		const query = interaction.options.getSubcommand();
+		const eventType = interaction.options.getString('event_type');
+		const notes = interaction.options.getString('notes');
+		const host = interaction.options.getString('host');
+		const hostId = await noblox.getIdFromUsername(host);
+		let headshotUrl = await noblox.getPlayerThumbnail(hostId, undefined, undefined, true, 'headshot');
+		headshotUrl = headshotUrl[0].imageUrl;
+		let date;
+		let fields;
+		let embed;
+		let toReply = 'Failed to plan the event due to invalid parameters';
 
 		switch (query) {
 		case 'debrief':
-			const eventType = interaction.options.getString('event_type');
-			const notes = interaction.options.getString('notes');
-			const host = interaction.options.getString('host');
 			const result = interaction.options.getString('result');
-			const hostId = await noblox.getIdFromUsername(host);
-
-			let date = new Date();
+			date = new Date();
 			date = date.toLocaleDateString('en-US', {
 				month: '2-digit',
 				day: '2-digit',
 				year: '2-digit',
 			});
-			let headshotUrl = await noblox.getPlayerThumbnail(hostId, undefined, undefined, true, 'headshot');
-			headshotUrl = headshotUrl[0].imageUrl;
-
-			const fields = [{ name: 'Host', value: host, inline: true }, { name: 'Result', value: result || 'N/A', inline: true }, { name: 'Debrief Notes', value: notes, inline: false }];
-			await createEvent({ eventType: eventType, hostId: hostId, date: date, notes: notes, result: result || 'N/A' });
-			const embed = EmbedBuilder('Event Log Notification', `Successfully logged an Avarian Reborn ${eventType} on ${date}!`, headshotUrl, fields);
-			await interaction.reply({ embeds: [embed] }); // change to log in the debriefs channel
+			if (hostId && headshotUrl) {
+				fields = [{ name: 'Host', value: `[${host}](https://www.roblox.com/users/${hostId}/profile)`, inline: true }, { name: 'Result', value: result || 'N/A', inline: true }, { name: 'Debrief Notes', value: notes, inline: false }];
+				await createEvent({ eventType: eventType, hostId: hostId, date: date, notes: notes, result: result || 'N/A' });
+				embed = EmbedBuilder('Event Notification', `Successfully logged an Avarian Reborn ${eventType} on ${date}!`, headshotUrl, fields);
+				toReply = { embeds: [embed] };
+			}
+			await interaction.reply(toReply);
 			break;
 		case 'plan':
-			// TO-DO: Fill this in and change to log in the planned_events channel or to the server events?
+			date = interaction.options.getString('time_date');
+			const locationID = interaction.options.getString('location');
+			if (parseInt(locationID) && hostId && headshotUrl) {
+				fields = [{ name: 'Event', value: eventType, inline: true }, { name: 'Host', value: `[${host}](https://www.roblox.com/users/${hostId}/profile)`, inline: true }, { name: 'Location', value: `https://www.roblox.com/games/${locationID}`, inline: false }, { name: 'Pre-Event Notes', value: notes, inline: false }];
+				embed = EmbedBuilder('Event Notification', `Successfully logged an Avarian Reborn ${eventType} on ${date}!`, headshotUrl, fields);
+				toReply = { embeds: [embed] };
+			}
+			await interaction.reply(toReply);
 			break;
 		default:
 			break;
