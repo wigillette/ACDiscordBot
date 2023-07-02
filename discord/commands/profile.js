@@ -11,7 +11,6 @@ module.exports = {
 			option.setName('username')
 				.setDescription('Enter the user\'s username')
 				.setRequired(true)),
-	admin: false,
 	async execute(interaction) {
 		const usernameField = interaction.options.getString('username');
 		if (usernameField && usernameField.length > 0) {

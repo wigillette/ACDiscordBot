@@ -1,11 +1,12 @@
 /* eslint-disable no-case-declarations */
 const EmbedBuilder = require('../embedBuilder.js');
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { createPlace, fetchAllPlaces, getPlace, deletePlace } = require('../../data/models/place.js');
 const PLACE_TYPES = require('../../shared/placeTypes.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
 		.setName('place')
 		.setDescription('Multiple commands related to registered places in Avarian Reborn')
 		.addSubcommand(command => command

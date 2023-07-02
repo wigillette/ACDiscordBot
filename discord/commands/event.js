@@ -1,12 +1,13 @@
 /* eslint-disable no-case-declarations */
 const noblox = require('noblox.js');
 const EmbedBuilder = require('../embedBuilder.js');
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const EVENT_TYPES = require('../../shared/eventTypes.js');
 const { createEvent } = require('../../data/models/event.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
 		.setName('event')
 		.setDescription('Multiple functions related to planning and debriefing events')
 		.addSubcommand(command => command

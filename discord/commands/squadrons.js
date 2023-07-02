@@ -12,7 +12,6 @@ module.exports = {
 				.setDescription('Squadron name')
 				.setRequired(true)
 				.addChoices({ name: 'Bloodhounds', value: 'Bloodhounds' }, { name: 'Fanguards', value: 'Fanguards' }, { name: 'Howlords', value: 'Howlords' })),
-	admin: false,
 	async execute(interaction) {
 		const squadronName = interaction.options.getString('name');
 		if (squadronName && squadronName.length > 0) {
