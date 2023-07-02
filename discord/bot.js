@@ -1,14 +1,22 @@
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
+const EmbedBuilder = require('./embedBuilder');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const fs = require('fs');
 const path = require('path');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
+const USER_CHANNEL = 'users';
 
 const initBot = () => {
 	client.commands = new Collection();
 	// Defining the Discord bot listeners
-	client.on('ready', () => console.log(`Logged in as ${client.user.tag}`));
+	client.on('ready', () => {
+		console.log(`Logged in as ${client.user.tag}`);
+		client.user.setPresence({
+			activities: [{ name: 'Avarian Reborn | Developed by Lusconox', type: ActivityType.Watching }],
+			status: 'dnd',
+		});
+	});
 
 	// Initialize Commands
 	const commandsPath = path.join(__dirname, 'commands');
@@ -39,6 +47,20 @@ const initBot = () => {
 			}
 		}
 	});
+
+	client.on('guildMemberAdd', member => {
+		const embed = EmbedBuilder('Join Notification', `${member.user} has joined ${member.guild}.`, member.user.avatarURL());
+		const channel = client.channels.cache.find(element => element.name === USER_CHANNEL);
+		channel.send({ embeds: [embed] });
+	},
+	);
+	client.on('guildMemberRemove', member => {
+		const embed = EmbedBuilder('Leave Notification', `${member.user} has left ${member.guild}.`, member.user.avatarURL());
+		const channel = client.channels.cache.find(element => element.name === USER_CHANNEL);
+		channel.send({ embeds: [embed] });
+	},
+	);
+
 
 	// Login and start up
 	client.login(process.env.BOT_TOKEN);
