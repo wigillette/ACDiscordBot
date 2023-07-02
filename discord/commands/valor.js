@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
 const { getUserByRobloxId, updateUser } = require('../../data/models/user');
+const { fetchAllValor, setValor } = require('../../data/models/valor');
 const noblox = require('noblox.js');
 const EmbedBuilder = require('../embedBuilder.js');
 const { SlashCommandBuilder } = require('discord.js');
@@ -76,9 +77,17 @@ module.exports = {
 			await interaction.reply({ embeds: embeds });
 			break;
 		case 'view_standards':
+			const standards = await fetchAllValor();
+			const roleStandards = await standards.map(async (standard) => {return { role: await noblox.getRole(process.env.GROUP_ID, standard.rank), ...standard };});
+			let toReply = 'Failed to fetch standards';
+			const standardFields = roleStandards.map((standard) => {return { name: standard.role, value: standard.valor, inline: true };});
+			const embed = EmbedBuilder('Avarian Reborn Valor Rank Standards', 'Below is a list of required valor amounts to attain each rank in AR.', undefined, standardFields);
+			toReply = { embeds: [embed] };
+
+			await interaction.reply(toReply);
 			break;
 		default:
-            await interaction.reply('Unknown error');
+			await interaction.reply('Unknown error');
 			break;
 		}
 
