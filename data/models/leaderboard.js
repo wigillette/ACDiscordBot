@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 // Database Variables
-const DEFAULT_LB = { kills: 0, deaths: 0, level: 1, exp: 0, equippedSword: 'default', captures: { gate: 0, terminal: 0 } };
+const DEFAULT_LB = { kills: 0, deaths: 0, level: 1, exp: 0, equippedSword: 'Default', captures: { gate: 0, terminal: 0 } };
 
 // Leaderboard Schema
 const leaderboardSchema = new Schema({
@@ -53,7 +53,7 @@ const getLeaderboard = async (robloxId) => {
 			console.error(`Invalid robloxId: ${robloxId}`);
 			return null;
 		}
-		const res = await LeaderboardModel.findOne({ _id: robloxId });
+		const res = await LeaderboardModel.findOne({ _id: robloxId }) || DEFAULT_LB;
 		return res;
 	}
 	catch (e) {
@@ -70,7 +70,7 @@ const getLeaderboard = async (robloxId) => {
 const updateLeaderboard = async (leaderboardData) => {
 	try {
 		const { _id, ...data } = leaderboardData;
-		const result = await LeaderboardModel.updateOne({ _id }, data);
+		const result = await LeaderboardModel.updateOne({ _id }, data, { upsert: true });
 		return result.modifiedCount;
 	}
 	catch (e) {

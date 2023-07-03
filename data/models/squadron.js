@@ -69,7 +69,7 @@ const getSquadron = async (squadronName) => {
  */
 const updateSquadron = async (squadronInfo) => {
 	try {
-		const result = await SquadronModel.updateOne({ _id: squadronInfo._id }, squadronInfo);
+		const result = await SquadronModel.updateOne({ _id: squadronInfo._id }, squadronInfo, { upsert: true });
 		return result.modifiedCount;
 	}
 	catch (error) {

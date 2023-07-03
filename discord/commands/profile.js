@@ -2,6 +2,7 @@ const { getUserByRobloxId } = require('../../data/models/user');
 const noblox = require('noblox.js');
 const EmbedBuilder = require('../embedBuilder.js');
 const { SlashCommandBuilder } = require('discord.js');
+const { getLeaderboard } = require('../../data/models/leaderboard');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -24,6 +25,8 @@ module.exports = {
 				const joinDate = robloxInfo.joinDate.toLocaleString();
 				const oldNames = robloxInfo.oldNames.reverse();
 				const avarianRank = await noblox.getRankNameInGroup(process.env.GROUP_ID, userId);
+				const leaderboardStats = await getLeaderboard(userId);
+
 
 				let headshotUrl = await noblox.getPlayerThumbnail(userId, undefined, undefined, true, 'bust');
 				headshotUrl = headshotUrl[0].imageUrl;
@@ -32,10 +35,16 @@ module.exports = {
 					{ name: 'Rank', value: avarianRank, inline: true },
 					{ name: 'Valor', value: userTableInfo.valor ? userTableInfo.valor.toString() : '0', inline: true },
 					{ name: 'Squadron', value: userTableInfo.squadronName || 'None', inline: true },
+					{ name: 'Level', value: leaderboardStats.level ? leaderboardStats.level.toString() : '1', inline: true },
+					{ name: 'Equipped Sword', value: leaderboardStats.equippedSword || 'Default', inline: true },
+					{ name: 'Global Kills', value: leaderboardStats.kills ? leaderboardStats.kills.toString() : '0', inline: true },
+					{ name: 'Global Deaths', value: leaderboardStats.deaths ? leaderboardStats.deaths.toString() : '0', inline: true },
+					{ name: 'Terminal Captures', value: (leaderboardStats.captures && leaderboardStats.captures.terminal) ? leaderboardStats.captures.terminal.toString() : '0', inline: true },
+					{ name: 'Gate Captures', value: (leaderboardStats.captures && leaderboardStats.captures.gate) ? leaderboardStats.captures.gate.toString() : '0', inline: true },
 					{ name: 'Last Active', value: userTableInfo.lastActive ? userTableInfo.lastActive.toString() : 'N/A', inline: true },
 					{ name: 'Blurb', value: blurb || 'None', inline: false },
 				];
-				const embed = EmbedBuilder(`${username} (${displayName}) Information`, `[Account](https://roblox.com/users/${userId}/profile) created on ${joinDate}.\n\n Formerly known as ${oldNames.join(', ')}.`, headshotUrl, fields);
+				const embed = EmbedBuilder(`${username} (${displayName}) Information`, `[Account](https://roblox.com/users/${userId}/profile) created on ${joinDate}.${oldNames.length > 0 ? `\n\n Formerly known as ${oldNames.join(', ')}.` : ''}`, headshotUrl, fields);
 
 				await interaction.reply({ embeds: [embed] });
 			}
