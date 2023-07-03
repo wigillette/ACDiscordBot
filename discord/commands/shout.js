@@ -4,6 +4,7 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
 		.setName('shout')
 		.setDescription('Post an announcement to the group and discord')
 		.addStringOption(option =>
