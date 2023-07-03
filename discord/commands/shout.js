@@ -1,6 +1,6 @@
 const noblox = require('noblox.js');
 const EmbedBuilder = require('../embedBuilder.js');
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
