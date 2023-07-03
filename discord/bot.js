@@ -67,4 +67,4 @@ const initBot = () => {
 	return client;
 };
 
-module.exports = { initBot };
+module.exports = { initBot, client };
