@@ -20,7 +20,7 @@ const setValor = async (valor) => {
 		let toReturn = -1;
 		const currentStandards = await fetchAllValor();
 		const index = rankIDs.indexOf(valor._id);
-		if (index > -1 && valor._id < process.env.MAX_VALOR_RANK) {
+		if (index > -1 && valor._id <= process.env.MAX_VALOR_RANK) {
 			const previousRankIDs = rankIDs.slice(0, index);
 			const nextRankIDs = rankIDs.slice(index + 1);
 			const previousStandards = currentStandards.filter((standard) =>
@@ -70,7 +70,7 @@ const setValor = async (valor) => {
 const fetchAllValor = async () => {
 	try {
 		const allStandards = await Valor.find();
-		const sortedValor = allStandards.sort(() => {return { _id: 1 };}); // Sort in ascending order
+		const sortedValor = allStandards.sort((a, b) => a._id - b._id); // Sort in ascending order
 		return sortedValor;
 	}
 	catch (e) {
