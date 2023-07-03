@@ -4,7 +4,6 @@ const noblox = require('noblox.js');
 
 const { initBot } = require('./discord/bot');
 const { initServer } = require('./server/app');
-const { createUser } = require ('./data/models/user');
 
 
 // Connect to the MongoDB database
@@ -17,7 +16,6 @@ connect().then(() => {
 			console.log(`Logged in as ${user.UserName} [${user.UserID}]`);
 			initServer(); // Initialize the web server
 			initBot(); // Boot up the discord bot
-			// createUser({ _id: 14320013, valor: 0, lastActive: '07/02/23', squadronName: 'Howlords' });
 		});
 	});
 }).catch((e) => {

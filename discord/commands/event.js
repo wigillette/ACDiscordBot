@@ -102,7 +102,7 @@ module.exports = {
 			const locationID = interaction.options.getString('location');
 			if (parseInt(locationID) && hostId && headshotUrl) {
 				fields = [{ name: 'Event', value: eventType, inline: true }, { name: 'Host', value: `[${host}](https://www.roblox.com/users/${hostId}/profile)`, inline: true }, { name: 'Location', value: `https://www.roblox.com/games/${locationID}`, inline: false }, { name: 'Pre-Event Notes', value: notes, inline: false }];
-				embed = EmbedBuilder('Event Notification', `Successfully logged an Avarian Reborn ${eventType} on ${date}!`, headshotUrl, fields);
+				embed = EmbedBuilder('Event Notification', `An Avarian Reborn ${eventType} has been planned on ${date}!`, headshotUrl, fields);
 				toReply = { embeds: [embed] };
 			}
 			await interaction.reply(toReply);

@@ -36,7 +36,7 @@ module.exports = {
 		switch (query) {
 		case 'view':
 			let joinRequests = await noblox.getJoinRequests(process.env.GROUP_ID, 'Asc');
-			joinRequests = joinRequests.data.length == 0 ? 'No requests' : joinRequests.data.map((request) => `◦  [${request.requester.username}](https://www.roblox.com/users/${request.requester.userId}/profile)`).join('\n');
+			joinRequests = joinRequests.data.length == 0 ? 'No requests' : joinRequests.data.map((request) => `◦ [${request.requester.username}](https://www.roblox.com/users/${request.requester.userId}/profile)`).join('\n');
 			const fields = [{ name: 'List', value: joinRequests, inline: false }];
 			embed = EmbedBuilder('Join Request Notification', 'Here is a list of the current join requests in Avarian Reborn:', undefined, fields);
 			await interaction.reply({ embeds: [embed] });

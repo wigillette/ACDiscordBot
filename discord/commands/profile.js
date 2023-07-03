@@ -40,12 +40,12 @@ module.exports = {
 				await interaction.reply({ embeds: [embed] });
 			}
 			catch (e) {
-				await interaction.reply('Unexpected error fetching username');
+				await interaction.reply({ embeds: [EmbedBuilder('Profile Notification', 'Failed to fetch user profile')] });
 				console.error('Error fetching player info: ', e);
 			}
 		}
 		else {
-			await interaction.reply('Invalid argument. Missing squadron name.');
+			await interaction.reply({ embeds: [EmbedBuilder('Profile Notification', 'Failed to fetch user profile')] });
 			console.error('Invalid argument specified');
 		}
 	},
